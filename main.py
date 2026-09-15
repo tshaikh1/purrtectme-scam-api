@@ -7,7 +7,7 @@ import os
 app = FastAPI(title="PurrtectMe Scam Detector")
 
 # Replace with your actual Hugging Face model path from Cell 6 of the training script
-MODEL_ID = "your-username/purrtectme-scam-detector-v1"
+MODEL_ID = "tshai1/purrtectme-scam-detector-v1"
 
 # A simple shared-secret key so random people on the internet can't call your model for free.
 # Set this in Render's environment variables (Step 4 below) — don't hardcode a real value here.
