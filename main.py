@@ -1,16 +1,20 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import pipeline
+import torch
 import os
 
 app = FastAPI(title="PurrtectMe Scam Detector")
 
 # Replace with your actual Hugging Face model path from Cell 6 of the training script
-MODEL_ID = "tshai1/purrtectme-scam-detector-v1"
+MODEL_ID = "your-username/purrtectme-scam-detector-v1"
 
 # A simple shared-secret key so random people on the internet can't call your model for free.
 # Set this in Render's environment variables (Step 4 below) — don't hardcode a real value here.
 API_KEY = os.environ.get("API_KEY", "change-me")
+
+# Keep memory and CPU usage as low as possible on Render's free tier
+torch.set_num_threads(1)
 
 classifier = None  # loaded on startup, see below
 
@@ -18,7 +22,12 @@ classifier = None  # loaded on startup, see below
 @app.on_event("startup")
 def load_model():
     global classifier
-    classifier = pipeline("text-classification", model=MODEL_ID)
+    classifier = pipeline(
+        "text-classification",
+        model=MODEL_ID,
+        torch_dtype=torch.float32,
+        model_kwargs={"low_cpu_mem_usage": True},
+    )
 
 
 class ClassifyRequest(BaseModel):
